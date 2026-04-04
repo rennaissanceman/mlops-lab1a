@@ -1,7 +1,13 @@
+# app.py
 from fastapi import FastAPI
+
+from api.models.iris import PredictRequest, PredictResponse
+from inference import load_model
 
 
 app = FastAPI()
+
+model = load_model()
 
 
 @app.get("/")
@@ -12,3 +18,9 @@ def welcome_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@app.post("/predict", response_model=PredictResponse)
+def predict(request: PredictRequest) -> PredictResponse:
+    prediction = model.predict(request.model_dump())
+    return PredictResponse(prediction=prediction)
